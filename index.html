@@ -1,0 +1,259 @@
+<!--
+  Spoon - The Most User Software (11kb)
+  Copyright (C) 2026  weirdo-kido
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License.
+
+  This program is distributed WITHOUT ANY WARRANTY; without even the
+  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See <https://www.gnu.org> for details.
+-->
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Spoon</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { 
+            background: #fff; color: #000; margin: 0; 
+            font-family: 'Courier New', Courier, monospace; 
+            height: 100%; overflow: hidden;
+        }
+        body { display: flex; flex-direction: column; }
+        #grid { 
+            flex: 1; display: flex; flex-direction: column;
+            overflow-y: auto; background: #fff; padding: 1.5rem;
+            scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        #grid::-webkit-scrollbar { display: none; }
+        .note { 
+            background: #fff; padding: 2.5rem 1rem; min-height: 150px; 
+            width: 100%; border-bottom: 1px solid #f9f9f9;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; font-size: 1.15rem; line-height: 1.6;
+            word-break: break-word; flex-shrink: 0;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .note.archived { color: #ccc; font-style: italic; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (min-width: 480px) { 
+            #grid { flex-direction: row-reverse; flex-wrap: wrap-reverse; align-content: flex-start; }
+            .note { width: 50%; border: none; } 
+        }
+        #input-area { 
+            flex-shrink: 0; padding: 2rem; background: #fff; 
+            border-top: 1px solid #eee; z-index: 100;
+            padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+        }
+        input { 
+            width: 100%; border: none; border-bottom: 2px solid #eee; 
+            outline: none; font-size: 1.2rem; padding: 10px 0; 
+            font-family: inherit; text-align: center; border-radius: 0;
+        }
+        #lock-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; display: none; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lock-overlay"><h1>Spoon is used.</h1></div>
+    <div id="grid"></div>
+
+    <div id="input-area">
+        <input type="text" id="noteInput" maxlength="70" placeholder="_" autofocus autocomplete="off" spellcheck="false">
+    </div>
+
+    <script>
+    const Spoon = {
+        db: null,
+        maxLen: 70,
+        debounceTimer: null,
+        pendingWrites: [], // Antrean buat HDD friendly
+        
+        async init() {
+            this.grid = document.getElementById('grid');
+            this.input = document.getElementById('noteInput');
+            
+            this.setupSync();
+            await this.initDB();
+            this.loadNotes(false);
+            this.bindEvents();
+        },
+
+        setupSync() {
+            this.channel = new BroadcastChannel('spoon_sync');
+            this.channel.onmessage = (e) => {
+                // Refresh cuma kalo gak lagi ngetik/nambah data biar gak jumpy
+                if (e.data === 'REFRESH') this.loadNotes(false);
+            };
+        },
+
+        initDB() {
+            return new Promise((resolve) => {
+                const req = indexedDB.open("SPOON_DB", 2); 
+                req.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if (e.oldVersion < 1) db.createObjectStore("notes", { keyPath: "ts" });
+                    if (e.oldVersion < 2) {
+                        const store = e.currentTarget.transaction.objectStore("notes");
+                        if (!store.indexNames.contains('archived')) {
+                            store.createIndex("archived", "archived", { unique: false });
+                        }
+                    }
+                };
+                req.onsuccess = e => { this.db = e.target.result; resolve(); };
+            });
+        },
+
+        // STRATEGI 1: Debouncing & Batching (Ramah HDD)
+        // STRATEGI 2: Web Locks API (Hapus Single Lock antar Tab)
+        async saveNoteBatch(val) {
+            // Optimistic UI: Tampilin dulu, simpen belakangan
+            const el = this.createNoteEl(val);
+            this.grid.prepend(el);
+            el.scrollIntoView({ behavior: 'smooth' });
+
+            this.pendingWrites.push({ ts: Date.now(), text: val, archived: false });
+
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(async () => {
+                // Minta izin lock ke browser biar gak tabrakan antar tab
+                await navigator.locks.request('spoon_db_lock', async () => {
+                    if (this.pendingWrites.length === 0) return;
+                    
+                    const dataToSave = [...this.pendingWrites];
+                    this.pendingWrites = [];
+
+                    const tx = this.db.transaction("notes", "readwrite");
+                    const store = tx.objectStore("notes");
+                    
+                    dataToSave.forEach(note => store.add(note));
+
+                    return new Promise((resolve) => {
+                        tx.oncomplete = () => {
+                            this.channel.postMessage('REFRESH');
+                            console.log(`[Disk-I/O] Synced ${dataToSave.length} notes.`);
+                            resolve();
+                        };
+                    });
+                });
+            }, 300);
+        },
+
+        createNoteEl(text, isArchived = false) {
+            const div = document.createElement('div');
+            div.className = 'note' + (isArchived ? ' archived' : '');
+            div.textContent = text;
+            return div;
+        },
+
+        loadNotes(showArchived = false) {
+            // Gunakan lock readonly biar gak interupsi proses tulis
+            navigator.locks.request('spoon_db_lock', { mode: 'shared' }, async () => {
+                const tx = this.db.transaction("notes", "readonly");
+                const store = tx.objectStore("notes");
+                store.getAll().onsuccess = e => {
+                    const notes = e.target.result
+                        .filter(n => showArchived ? true : !n.archived)
+                        .sort((a, b) => b.ts - a.ts);
+                    
+                    this.grid.innerHTML = '';
+                    const fragment = document.createDocumentFragment();
+                    notes.forEach(n => fragment.appendChild(this.createNoteEl(n.text, n.archived)));
+                    this.grid.appendChild(fragment);
+                    this.scrollToBottom();
+                };
+            });
+        },
+
+        scrollToBottom() {
+            requestAnimationFrame(() => { this.grid.scrollTop = this.grid.scrollHeight; });
+        },
+
+        async handleArchive() {
+            await navigator.locks.request('spoon_db_lock', async () => {
+                const tx = this.db.transaction("notes", "readwrite");
+                const store = tx.objectStore("notes");
+                store.openCursor().onsuccess = e => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        if (!cursor.value.archived) {
+                            const data = cursor.value;
+                            data.archived = true;
+                            cursor.update(data);
+                        }
+                        cursor.continue();
+                    }
+                };
+                tx.oncomplete = () => {
+                    this.grid.innerHTML = '';
+                    this.channel.postMessage('REFRESH');
+                };
+            });
+        },
+
+        handleExportNuke() {
+            const tx = this.db.transaction("notes", "readwrite");
+            const store = tx.objectStore("notes");
+            store.getAll().onsuccess = e => {
+                const data = e.target.result;
+                if (!data.length) return;
+                const csv = "Timestamp,Note,Archived\n" + data.map(n => 
+                    `${n.ts},"${n.text.replace(/"/g, '""')}",${!!n.archived}`
+                ).join("\n");
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `spoon_nuke_${Date.now()}.csv`; a.click();
+                store.clear();
+            };
+            tx.oncomplete = () => {
+                this.grid.innerHTML = '';
+                this.channel.postMessage('REFRESH');
+            };
+        },
+
+        bindEvents() {
+            this.input.onkeydown = e => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    this.handleArchive();
+                    return;
+                }
+                
+                if (e.key === 'Enter' && this.input.value.trim()) {
+                    const val = this.input.value.trim().substring(0, this.maxLen);
+
+                    if (val === '/export') { this.handleExportNuke(); }
+                    else if (val === '/archive') { this.handleArchive(); }
+                    else if (val === '/reveal') { this.loadNotes(true); }
+                    else if (val === '/hide') { this.loadNotes(false); }
+                    else { this.saveNoteBatch(val); }
+
+                    this.input.value = '';
+                    this.input.style.borderImage = 'none';
+                }
+            };
+
+            this.input.oninput = () => {
+                const progress = (this.input.value.length / this.maxLen) * 100;
+                this.input.style.borderImage = `linear-gradient(to right, #000 ${progress}%, #eee ${progress}%) 1`;
+            };
+
+            document.addEventListener('click', () => this.input.focus());
+            window.addEventListener('focus', () => this.input.focus());
+        }
+    };
+
+    Spoon.init();
+</script>
+</body>
+  </html>
