@@ -6,7 +6,7 @@
 
 ### Why? 
 > **Buttonless**  
-> **Desktop only**  
+> **Desktop ~~only~~ for Z-flow**  
 > **No Warranty**
 
 ### Usage 
