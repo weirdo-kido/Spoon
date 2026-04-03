@@ -1,6 +1,6 @@
 <!--
   Spoon - The Most User Software
-  Copyright (C) 2026  weirdo-kido
+  Copyright (C) 2026 weirdo-kido
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover">
   <meta name="description" content="Spoon: It just Spoon.">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥄</text></svg>">
@@ -55,7 +55,7 @@
             word-break: break-word; flex-shrink: 0;
             contain: content;
             animation: fadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            will-change: opacity, transform;
+            will-change: opacity, transform; user-select: none;
         }
 
         .note.archived { color: #bbb; font-style: italic; opacity: 0.6; }
@@ -87,7 +87,7 @@
 <body>
     <div id="grid"></div>
     <div id="input-area">
-        <input type="text" id="noteInput" maxlength="70" placeholder="_" aria-label="Type here" autofocus autocomplete="off" spellcheck="false" enterkeyhint="send">
+        <input type="text" id="noteInput" maxlength="70" placeholder="_" aria-label="Type here" autocomplete="off" spellcheck="false" enterkeyhint="send">
     </div>
 
 <script>
@@ -277,36 +277,15 @@ const Spoon = {
                 else if (val === '/hide') this.loadNotes(false);
                 else this.saveNoteBatch(val);
                 this.input.value = '';
+                this.input.blur();
             }
         };
-        const focusInput = () => this.input.focus();
+        /* const focusInput = () => this.input.focus();
         document.addEventListener('click', focusInput);
-        window.addEventListener('focus', focusInput);
+        window.addEventListener('focus', focusInput); */
     }
 };
 Spoon.init();
-</script>
-<script>
-(function() {
-    const input = document.getElementById('noteInput');
-    if (!input) return;
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            setTimeout(() => {
-                input.value = '';
-                input.blur(); 
-            }, 50);
-        }
-    });
-
-    document.removeEventListener('click', Spoon.focusInput); 
-    document.addEventListener('click', (e) => {
-        if (e.target.tagName === 'BODY' || e.target.id === 'input-area') {
-            input.focus();
-        }
-    });
-})();
 </script>
 </body>
 </html>
