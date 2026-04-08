@@ -1,4 +1,3 @@
-name: "Tanya Kido"
 body:
   - type: dropdown
     id: tech
