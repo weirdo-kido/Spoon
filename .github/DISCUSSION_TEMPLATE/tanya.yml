@@ -15,6 +15,6 @@ body:
       label: "Use Vanilla JS?"
       options:
         - "Yes"
-        - "はい"
+        - "Yes"
     validations:
       required: true
