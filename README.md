@@ -15,5 +15,5 @@
 3. Enter.
 
 ---
- Kaga gua minify. ( ・∀・)  
- Licensed under **GPLv3**.
+ Kaga gua _![minify](index.html)_. ( ・∀・)  
+ Licensed under **![GPLv3](LICENSE)**.
