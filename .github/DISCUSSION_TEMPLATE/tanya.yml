@@ -1,5 +1,4 @@
-name: Tanya Kido
-label: Tanya apa?
+name: "Tanya Kido"
 body:
   - type: dropdown
     id: tech
