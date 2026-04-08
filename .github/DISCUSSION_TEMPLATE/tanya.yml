@@ -1,0 +1,20 @@
+name: "Tanya Weirdo Kido"
+description: "Form for Human"
+title: "[Tanya] "
+body:
+  - type: textarea
+    id: deskripsi
+    attributes:
+      label: "Nanya apa?"
+      placeholder: "Type at this..."
+    validations:
+      required: true
+  - type: dropdown
+    id: tech
+    attributes:
+      label: "Use Vanilla JS?"
+      options:
+        - "Yes"
+        - "はい"
+    validations:
+      required: true
