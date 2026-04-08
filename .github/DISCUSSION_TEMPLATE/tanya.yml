@@ -1,11 +1,8 @@
-name: "General"
-description: "Ask Kido"
-title: "[Tanya] "
 body:
   - type: dropdown
     id: tech
     attributes:
-      label: "Lu pake Vanilla JS?"
+      label: Lu pake Vanilla JS?
       options:
         - Iya
         - Yes
