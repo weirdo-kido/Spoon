@@ -1,4 +1,4 @@
-title: "[General] "
+title: ""
 labels: ["General Introduction"]
 body:
   - type: markdown
@@ -32,4 +32,4 @@ body:
     attributes:
       value: |
         ---
-        *Terima Kasih | Thaks | ありがとう。*
+        *Terima Kasih | Thank You | ありがとう。*
