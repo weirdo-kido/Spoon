@@ -1,5 +1,5 @@
-name: "Tanya Kido"
-description: "Form for Human"
+name: "General"
+description: "Ask Kido"
 title: "[Tanya] "
 body:
   - type: textarea
