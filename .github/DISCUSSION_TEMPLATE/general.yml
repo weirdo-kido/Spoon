@@ -1,0 +1,35 @@
+title: "[General] "
+labels: ["General Introduction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Form I'm human at below.
+
+  - type: textarea
+    id: detail-diskusi
+    attributes:
+      label: Discuss what?
+      description: "Type want to discuss."
+      placeholder: "Type here ..."
+    validations:
+      required: true
+
+  # Bagian Checkboxes (Buat ceklis)
+  - type: checkboxes
+    id: konfirmasi
+    attributes:
+      label: Konfirmasi dulu ya
+      options:
+        - label: "Gua udah check LICENSE"
+          required: true
+        - label: "Gua janji gua manusia"
+          required: true
+        - label: "Gua pake Vanilla JS (opsional)"
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        *Terima Kasih | Thaks | ありがとう。*
