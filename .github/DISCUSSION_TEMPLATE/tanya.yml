@@ -4,7 +4,8 @@ body:
     attributes:
       label: Lu pake Vanilla JS?
       options:
-        - Iya
-        - Yes
+        - "Iya"
+        - "Yes"
+        - Ya
     validations:
       required: true
