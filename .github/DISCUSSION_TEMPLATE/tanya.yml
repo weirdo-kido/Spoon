@@ -2,19 +2,12 @@ name: "General"
 description: "Ask Kido"
 title: "[Tanya] "
 body:
-  - type: textarea
-    id: deskripsi
-    attributes:
-      label: "Mau nanya apa bro?"
-      placeholder: "Type at this..."
-    validations:
-      required: true
   - type: dropdown
     id: tech
     attributes:
-      label: "Lu pake apa?"
+      label: "Lu pake Vanilla JS?"
       options:
-        - "Vanilla JS"
-        - "Vanilla JS"
+        - Iya
+        - Yes
     validations:
       required: true
