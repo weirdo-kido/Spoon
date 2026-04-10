@@ -19,7 +19,7 @@ body:
     attributes:
       label: Konfirmasi dulu ya
       options:
-        - label: "Gua udah check LICENSE"
+        - label: "Gua udah check LICENSE and CODE OF CONDUCT"
           required: true
         - label: "Gua janji gua manusia"
           required: true
