@@ -18,7 +18,9 @@
 |4.|`,reveal`|To reveal archived memo
 |5.|`,send`|To backup memo and send to ```.json``` file
 
-> **update**: change to comma "," because is closer to my thumb than slash "/" at my phone.
+<details>
+
+ > **update**: change to comma "," because is closer to my thumb than slash "/" at my phone. </details>
 
 ## Tutorial 
 1. Open **[Spoon](https://weirdo-kido.github.io/Spoon)**.
