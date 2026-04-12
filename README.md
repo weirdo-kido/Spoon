@@ -12,11 +12,13 @@
 ## Command
 |No.|Command|Function|
 |---|---|---|
-|1.|`/archive` or `ctrl + Enter`|To archive memo from screen
-|2.|`/export`|To ...
-|3.|`/hide`|To hide after reveal archived memo
-|4.|`/reveal`|To reveal archived memo
-|5.|`/send`|To backup memo and send to ```.json``` file
+|1.|`,archive` or `ctrl + Enter`|To archive memo from screen
+|2.|`,export`|To ...
+|3.|`,hide`|To hide after reveal archived memo
+|4.|`,reveal`|To reveal archived memo
+|5.|`,send`|To backup memo and send to ```.json``` file
+
+> **update**: change to comma "," because is closer to my thumb than slash "/" at my phone.
 
 ## Tutorial 
 1. Open **[Spoon](https://weirdo-kido.github.io/Spoon)**.
