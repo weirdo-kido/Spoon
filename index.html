@@ -270,11 +270,11 @@ const Spoon = {
             if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { this.handleArchive(); return; }
             if (e.key === 'Enter' && this.input.value.trim()) {
                 const val = this.input.value.trim().substring(0, this.maxLen);
-                if (val === '/export') await this.handleExportNuke();
-                else if (val === '/send') await this.handleBackupJSON();
-                else if (val === '/archive') await this.handleArchive();
-                else if (val === '/reveal') this.loadNotes(true);
-                else if (val === '/hide') this.loadNotes(false);
+                if (val === ',export') await this.handleExportNuke();
+                else if (val === ',send') await this.handleBackupJSON();
+                else if (val === ',archive') await this.handleArchive();
+                else if (val === ',reveal') this.loadNotes(true);
+                else if (val === ',hide') this.loadNotes(false);
                 else this.saveNoteBatch(val);
                 this.input.value = '';
                 this.input.blur();
