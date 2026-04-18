@@ -20,6 +20,7 @@ body:
       options:
       - "Iya"
       - "はい"
+      - "Yes"
     validations:
       required: true
 
