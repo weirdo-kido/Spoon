@@ -13,7 +13,17 @@ body:
     validations:
       required: true
 
-  # Bagian Checkboxes (Buat ceklis)
+  - type: dropdown
+    id: human
+    attributes:
+      label: Are you human?
+      options:
+      - "Iya"
+      - "はい"
+      - Yes
+    validations:
+      required: true
+
   - type: checkboxes
     id: konfirmasi
     attributes:
