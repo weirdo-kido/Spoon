@@ -19,7 +19,7 @@ body:
       label: Are you human?
       options:
       - "Iya"
-      - Yes
+      - "はい"
     validations:
       required: true
 
