@@ -74,6 +74,10 @@
             to { opacity: 1; transform: translateY(0); } 
         }
 
+      @media (max-width: 479px) { 
+            #grid { flex-direction: column-reverse; }
+      }
+    
         @media (min-width: 480px) { 
             #grid { flex-direction: row-reverse; flex-wrap: wrap-reverse; align-content: flex-start; }
             .note { width: 50%; border-right: 1px solid #e5e5e7; } 
@@ -286,7 +290,7 @@ const Spoon = {
                 else if (val === ',hide') this.loadNotes(false);
                 else this.saveNoteBatch(val);
                 this.input.value = '';
-                this.input.blur();
+                //this.input.blur();
             }
         };
         /* const focusInput = () => this.input.focus();
